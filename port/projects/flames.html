@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLAMES Relationship Calculator</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            /* Removed display: flex, justify-content, align-items, min-height for integration */
+            margin: 0;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto; /* Centered the container */
+        }
+
+        h1 {
+            color: #e94e77;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            padding: 12px 15px;
+            border: 2px solid #ffafbd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #e94e77;
+        }
+
+        button {
+            background-color: #e94e77;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #d43a60;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #e94e77;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .result span {
+            display: block;
+        }
+
+        .result .emoji {
+            font-size: 1.5em;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Flames</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>FLAMES Relationship Calculator</h2>
+            <div class="container">
+                <h1>FLAMES Relationship Calculator</h1>
+                <div class="input-group">
+                    <label for="name1">Your Name:</label>
+                    <input type="text" id="name1" placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label for="name2">Others Name:</label>
+                    <input type="text" id="name2" placeholder="Enter Others name">
+                </div>
+                <button id="calculateBtn">Calculate FLAMES</button>
+                <div class="result" id="result"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 My Portfolio</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const name1Input = document.getElementById('name1');
+            const name2Input = document.getElementById('name2');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultDiv = document.getElementById('result');
+
+            const flames = ['F', 'L', 'A', 'M', 'E', 'S'];
+            const relationshipMap = {
+                'F': 'Friends',
+                'L': 'Love',
+                'A': 'Affection',
+                'M': 'Marriage',
+                'E': 'Enemies',
+                'S': 'Siblings'
+            };
+            const emojiMap = {
+                'Friends': '🤝',
+                'Love': '❤️',
+                'Affection': '😊',
+                'Marriage': '💍',
+                'Enemies': '😡',
+                'Siblings': '🧑‍🤝‍🧑'
+            };
+
+            calculateBtn.addEventListener('click', () => {
+                let name1 = name1Input.value.toLowerCase().replace(/\s/g, '');
+                let name2 = name2Input.value.toLowerCase().replace(/\s/g, '');
+
+                if (!name1 || !name2) {
+                    resultDiv.innerHTML = 'Please enter both names!';
+                    return;
+                }
+
+                const nameRegex = /^[a-zA-Z]+$/;
+                if (!nameRegex.test(name1)) {
+                    resultDiv.innerHTML = 'Name 1 should only contain alphabetic characters!';
+                    return;
+                }
+                if (!nameRegex.test(name2)) {
+                    resultDiv.innerHTML = 'Name 2 should only contain alphabetic characters!';
+                    return;
+                }
+
+                let name1Arr = name1.split('');
+                let name2Arr = name2.split('');
+
+                // Remove common letters
+                for (let i = 0; i < name1Arr.length; i++) {
+                    for (let j = 0; j < name2Arr.length; j++) {
+                        if (name1Arr[i] === name2Arr[j]) {
+                            name1Arr.splice(i, 1);
+                            name2Arr.splice(j, 1);
+                            i--; // Adjust index after removal
+                            break;
+                        }
+                    }
+                }
+
+                const remainingCount = name1Arr.length + name2Arr.length;
+
+                if (remainingCount === 0) {
+                    resultDiv.innerHTML = '<span>It\'s complicated!</span>';
+                    return;
+                }
+
+                let currentFlames = [...flames];
+                let currentIndex = 0;
+
+                while (currentFlames.length > 1) {
+                    currentIndex = (currentIndex + remainingCount - 1) % currentFlames.length;
+                    currentFlames.splice(currentIndex, 1);
+                }
+
+                const finalFlamesLetter = currentFlames[0];
+                const relationship = relationshipMap[finalFlamesLetter];
+                const emoji = emojiMap[relationship];
+
+                resultDiv.innerHTML = `<span>${relationship}</span><span class="emoji">${emoji}</span>`;
+            });
+        });
+    </script>
+</body>
+</html>
